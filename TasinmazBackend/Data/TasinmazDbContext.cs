@@ -14,6 +14,7 @@ namespace TasinmazBackend.Data
         public DbSet<Ilce> Ilceler { get; set; }
         public DbSet<Mahalle> Mahaller { get; set; }
         public DbSet<Tasinmaz> Tasinmazlar { get; set; }
+        public object Mahalleler { get; internal set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
