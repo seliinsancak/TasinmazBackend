@@ -4,16 +4,19 @@ using TasinmazBackend.DTO.Request;
 using TasinmazBackend.DTO.Response;
 using TasinmazBackend.Entities;
 using TasinmazBackend.Interfaces;
+using AutoMapper;
 
 namespace TasinmazBackend.Services
 {
     public class TasinmazService : ITasinmazService
     {
         private readonly TasinmazDbContext _context;
+        private readonly IMapper _mapper;
 
-        public TasinmazService(TasinmazDbContext context)
+        public TasinmazService(TasinmazDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         
@@ -25,22 +28,10 @@ namespace TasinmazBackend.Services
                         .ThenInclude(i => i.Il)
                 .ToListAsync();
 
-            var result = tasinmazlar.Select(t => new TasinmazResponseDTO
-            {
-                Id = t.Id,
-                Ada = t.Ada,
-                Parsel = t.Parsel,
-                Nitelik = t.Nitelik,
-                Adres = t.Adres,
-                Mahalle = t.Mahalle?.Ad,
-                Ilce = t.Mahalle?.Ilce?.Ad,
-                Il = t.Mahalle?.Ilce?.Il?.Ad
-            }).ToList();
-
-            return result;
+            return _mapper.Map<List<TasinmazResponseDTO>>(tasinmazlar);
         }
 
-       
+        
         public async Task<TasinmazResponseDTO> GetByIdAsync(int id)
         {
             var t = await _context.Tasinmazlar
@@ -51,29 +42,13 @@ namespace TasinmazBackend.Services
 
             if (t == null) return null;
 
-            return new TasinmazResponseDTO
-            {
-                Id = t.Id,
-                Ada = t.Ada,
-                Parsel = t.Parsel,
-                Nitelik = t.Nitelik,
-                Adres = t.Adres,
-                Mahalle = t.Mahalle?.Ad,
-                Ilce = t.Mahalle?.Ilce?.Ad,
-                Il = t.Mahalle?.Ilce?.Il?.Ad
-            };
+            return _mapper.Map<TasinmazResponseDTO>(t);
         }
 
+        
         public async Task<bool> AddAsync(TasinmazEkleRequestDTO dto)
         {
-            var entity = new Tasinmaz
-            {
-                Ada = dto.Ada,
-                Parsel = dto.Parsel,
-                Nitelik = dto.Nitelik,
-                Adres = dto.Adres,
-                MahalleId = dto.MahalleId
-            };
+            var entity = _mapper.Map<Tasinmaz>(dto);
 
             await _context.Tasinmazlar.AddAsync(entity);
             return await _context.SaveChangesAsync() > 0;

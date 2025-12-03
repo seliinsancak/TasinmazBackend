@@ -2,21 +2,26 @@ using Microsoft.EntityFrameworkCore;
 using TasinmazBackend.Data;
 using TasinmazBackend.Interfaces;
 using TasinmazBackend.Services;
-
+using AutoMapper;
+using TasinmazBackend.Mappings;  
 var builder = WebApplication.CreateBuilder(args);
 
-
+// Database
 builder.Services.AddDbContext<TasinmazDbContext>(options =>
     options.UseSqlServer("Server=.;Database=TasinmazDB;Trusted_Connection=True;"));
 
-
+// Services
 builder.Services.AddScoped<ITasinmazService, TasinmazService>();
+
+// AutoMapper
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
 
 if (app.Environment.IsDevelopment())
 {
@@ -26,6 +31,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
+
 app.MapControllers();
 
 app.Run();
