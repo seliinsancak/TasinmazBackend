@@ -19,18 +19,21 @@ namespace TasinmazBackend.Data
         {
             base.OnModelCreating(modelBuilder);
 
+       
             modelBuilder.Entity<Il>()
                 .HasMany(i => i.Ilceler)
                 .WithOne(ic => ic.Il)
                 .HasForeignKey(ic => ic.IlId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            
             modelBuilder.Entity<Ilce>()
                 .HasMany(ic => ic.Mahalleler)
                 .WithOne(m => m.Ilce)
                 .HasForeignKey(m => m.IlceId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            
             modelBuilder.Entity<Mahalle>()
                 .HasMany(m => m.Tasinmazlar)
                 .WithOne(t => t.Mahalle)

@@ -15,37 +15,55 @@ namespace TasinmazBackend.Controllers
             _service = service;
         }
 
-        
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var result = await _service.GetAllAsync();
-            return Ok(result);
+            try
+            {
+                var result = await _service.GetAllAsync();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Taşınmazlar alınırken bir hata oluştu.", detail = ex.Message });
+            }
         }
 
-        
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var result = await _service.GetByIdAsync(id);
-            if (result == null)
-                return NotFound();
+            try
+            {
+                var result = await _service.GetByIdAsync(id);
+                if (result == null)
+                    return NotFound(new { message = $"ID {id} ile taşınmaz bulunamadı." });
 
-            return Ok(result);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"ID {id} ile taşınmaz alınırken bir hata oluştu.", detail = ex.Message });
+            }
         }
 
-        
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] TasinmazEkleRequestDTO dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var success = await _service.AddAsync(dto);
-            if (!success)
-                return BadRequest("Ekleme işlemi başarısız oldu.");
+            try
+            {
+                var success = await _service.AddAsync(dto);
+                if (!success)
+                    return BadRequest(new { message = "Ekleme işlemi başarısız oldu." });
 
-            return Ok("Ekleme başarılı.");
+                return Ok(new { message = "Ekleme başarılı." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Taşınmaz eklenirken bir hata oluştu.", detail = ex.Message });
+            }
         }
     }
 }
