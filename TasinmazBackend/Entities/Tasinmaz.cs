@@ -8,11 +8,10 @@
         public string Nitelik { get; set; }
         public string Adres { get; set; }
 
+        // Foreign Key
         public int MahalleId { get; set; }
         public Mahalle Mahalle { get; set; }
 
-   
-        public string Ad { get; set; } = string.Empty;
-        public int Fiyat { get; set; } = 0;
+    
     }
 }

@@ -31,11 +31,24 @@ namespace TasinmazBackend.Migrations
 
                     b.Property<string>("Ad")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
 
                     b.ToTable("Iller", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Ad = "Ankara"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Ad = "İstanbul"
+                        });
                 });
 
             modelBuilder.Entity("TasinmazBackend.Entities.Ilce", b =>
@@ -48,7 +61,8 @@ namespace TasinmazBackend.Migrations
 
                     b.Property<string>("Ad")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("IlId")
                         .HasColumnType("int");
@@ -58,6 +72,32 @@ namespace TasinmazBackend.Migrations
                     b.HasIndex("IlId");
 
                     b.ToTable("Ilceler", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Ad = "Çankaya",
+                            IlId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Ad = "Keçiören",
+                            IlId = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Ad = "Kadıköy",
+                            IlId = 2
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Ad = "Beşiktaş",
+                            IlId = 2
+                        });
                 });
 
             modelBuilder.Entity("TasinmazBackend.Entities.Mahalle", b =>
@@ -70,7 +110,8 @@ namespace TasinmazBackend.Migrations
 
                     b.Property<string>("Ad")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("IlceId")
                         .HasColumnType("int");
@@ -79,7 +120,51 @@ namespace TasinmazBackend.Migrations
 
                     b.HasIndex("IlceId");
 
-                    b.ToTable("Mahaller", (string)null);
+                    b.ToTable("Mahalleler", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Ad = "Kızılay",
+                            IlceId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Ad = "Dikmen",
+                            IlceId = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Ad = "Bağlum",
+                            IlceId = 2
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Ad = "Moda",
+                            IlceId = 3
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Ad = "Erenköy",
+                            IlceId = 3
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Ad = "Levent",
+                            IlceId = 4
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Ad = "Akatlar",
+                            IlceId = 4
+                        });
                 });
 
             modelBuilder.Entity("TasinmazBackend.Entities.Tasinmaz", b =>
@@ -92,22 +177,26 @@ namespace TasinmazBackend.Migrations
 
                     b.Property<string>("Ada")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Adres")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
 
                     b.Property<int>("MahalleId")
                         .HasColumnType("int");
 
                     b.Property<string>("Nitelik")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
                     b.Property<string>("Parsel")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.HasKey("Id");
 
@@ -121,7 +210,7 @@ namespace TasinmazBackend.Migrations
                     b.HasOne("TasinmazBackend.Entities.Il", "Il")
                         .WithMany("Ilceler")
                         .HasForeignKey("IlId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Il");
@@ -132,7 +221,7 @@ namespace TasinmazBackend.Migrations
                     b.HasOne("TasinmazBackend.Entities.Ilce", "Ilce")
                         .WithMany("Mahalleler")
                         .HasForeignKey("IlceId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Ilce");
@@ -143,7 +232,7 @@ namespace TasinmazBackend.Migrations
                     b.HasOne("TasinmazBackend.Entities.Mahalle", "Mahalle")
                         .WithMany("Tasinmazlar")
                         .HasForeignKey("MahalleId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Mahalle");

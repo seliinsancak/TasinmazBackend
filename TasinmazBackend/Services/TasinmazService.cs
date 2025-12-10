@@ -1,10 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using TasinmazBackend.Data;
 using TasinmazBackend.DTO.Request;
 using TasinmazBackend.DTO.Response;
 using TasinmazBackend.Entities;
 using TasinmazBackend.Interfaces;
-using AutoMapper;
 
 namespace TasinmazBackend.Services
 {
@@ -21,60 +21,68 @@ namespace TasinmazBackend.Services
 
         public async Task<List<TasinmazResponseDTO>> GetAllAsync()
         {
-            try
-            {
-                var tasinmazlar = await _context.Tasinmazlar
-                    .Include(t => t.Mahalle)
-                        .ThenInclude(m => m.Ilce)
-                            .ThenInclude(i => i.Il)
-                    .ToListAsync();
+            var data = await _context.Tasinmazlar
+                .Include(t => t.Mahalle)
+                    .ThenInclude(m => m.Ilce)
+                        .ThenInclude(i => i.Il)
+                .ToListAsync();
 
-                return _mapper.Map<List<TasinmazResponseDTO>>(tasinmazlar);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Taşınmazlar alınırken bir hata oluştu.", ex);
-            }
+            return _mapper.Map<List<TasinmazResponseDTO>>(data);
         }
 
-        public async Task<TasinmazResponseDTO> GetByIdAsync(int id)
+        public async Task<TasinmazResponseDTO?> GetByIdAsync(int id)
         {
-            try
-            {
-                var t = await _context.Tasinmazlar
-                    .Include(t => t.Mahalle)
-                        .ThenInclude(m => m.Ilce)
-                            .ThenInclude(i => i.Il)
-                    .FirstOrDefaultAsync(x => x.Id == id);
+            var entity = await _context.Tasinmazlar
+                .Include(t => t.Mahalle)
+                    .ThenInclude(m => m.Ilce)
+                        .ThenInclude(i => i.Il)
+                .FirstOrDefaultAsync(t => t.Id == id);
 
-                if (t == null) return null;
-
-                return _mapper.Map<TasinmazResponseDTO>(t);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"ID {id} ile taşınmaz alınırken bir hata oluştu.", ex);
-            }
+            return _mapper.Map<TasinmazResponseDTO>(entity);
         }
 
         public async Task<bool> AddAsync(TasinmazEkleRequestDTO dto)
         {
-            using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
                 var entity = _mapper.Map<Tasinmaz>(dto);
 
                 await _context.Tasinmazlar.AddAsync(entity);
-                var result = await _context.SaveChangesAsync() > 0;
+                await _context.SaveChangesAsync();
 
-                await transaction.CommitAsync();
-                return result;
+                return true;
             }
-            catch (Exception ex)
+            catch
             {
-                await transaction.RollbackAsync();
-                throw new Exception("Taşınmaz eklenirken bir hata oluştu.", ex);
+                return false;
             }
+        }
+
+        
+        public async Task<bool> UpdateAsync(int id, TasinmazEkleRequestDTO dto)
+        {
+            var tasinmaz = await _context.Tasinmazlar.FindAsync(id);
+            if (tasinmaz == null) return false;
+
+            tasinmaz.Ada = dto.Ada;
+            tasinmaz.Parsel = dto.Parsel;
+            tasinmaz.Nitelik = dto.Nitelik;
+            tasinmaz.Adres = dto.Adres;
+            tasinmaz.MahalleId = dto.MahalleId;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        
+        public async Task<bool> DeleteAsync(int id)
+        {
+            var tasinmaz = await _context.Tasinmazlar.FindAsync(id);
+            if (tasinmaz == null) return false;
+
+            _context.Tasinmazlar.Remove(tasinmaz);
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TasinmazBackend.DTO.Request;
 using TasinmazBackend.Interfaces;
+using TasinmazBackend.DTO.Request;
 
 namespace TasinmazBackend.Controllers
 {
@@ -8,61 +8,122 @@ namespace TasinmazBackend.Controllers
     [Route("api/[controller]")]
     public class TasinmazController : ControllerBase
     {
-        private readonly ITasinmazService _service;
+        private readonly ITasinmazService _tasinmazService;
 
-        public TasinmazController(ITasinmazService service)
+        public TasinmazController(ITasinmazService tasinmazService)
         {
-            _service = service;
+            _tasinmazService = tasinmazService;
         }
 
+        // GET api/tasinmaz
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             try
             {
-                var result = await _service.GetAllAsync();
+                var result = await _tasinmazService.GetAllAsync();
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Taşınmazlar alınırken bir hata oluştu.", detail = ex.Message });
+                return Problem(
+                    title: "Sunucu hatası",
+                    detail: ex.Message,
+                    statusCode: 500
+                );
             }
         }
 
+        // GET api/tasinmaz/{id}
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
             try
             {
-                var result = await _service.GetByIdAsync(id);
+                var result = await _tasinmazService.GetByIdAsync(id);
+
                 if (result == null)
-                    return NotFound(new { message = $"ID {id} ile taşınmaz bulunamadı." });
+                    return NotFound(new { message = "Taşınmaz bulunamadı" });
 
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = $"ID {id} ile taşınmaz alınırken bir hata oluştu.", detail = ex.Message });
+                return Problem(
+                    title: "Sunucu hatası",
+                    detail: ex.Message,
+                    statusCode: 500
+                );
             }
         }
 
+        // POST api/tasinmaz
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] TasinmazEkleRequestDTO dto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             try
             {
-                var success = await _service.AddAsync(dto);
-                if (!success)
-                    return BadRequest(new { message = "Ekleme işlemi başarısız oldu." });
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
 
-                return Ok(new { message = "Ekleme başarılı." });
+                var success = await _tasinmazService.AddAsync(dto);
+
+                if (!success)
+                    return BadRequest(new { message = "Ekleme işlemi başarısız" });
+
+                return Ok(new { message = "Taşınmaz başarıyla eklendi" });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Taşınmaz eklenirken bir hata oluştu.", detail = ex.Message });
+                return Problem(
+                    title: "Sunucu hatası",
+                    detail: ex.Message,
+                    statusCode: 500
+                );
+            }
+        }
+
+        // PUT api/tasinmaz/{id}
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] TasinmazEkleRequestDTO dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            try
+            {
+                var success = await _tasinmazService.UpdateAsync(id, dto);
+                if (!success) return NotFound(new { message = "Taşınmaz bulunamadı" });
+
+                return Ok(new { message = "Taşınmaz başarıyla güncellendi" });
+            }
+            catch (Exception ex)
+            {
+                return Problem(
+                    title: "Sunucu hatası",
+                    detail: ex.Message,
+                    statusCode: 500
+                );
+            }
+        }
+
+        // DELETE api/tasinmaz/{id}
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            try
+            {
+                var success = await _tasinmazService.DeleteAsync(id);
+                if (!success) return NotFound(new { message = "Taşınmaz bulunamadı" });
+
+                return Ok(new { message = "Taşınmaz başarıyla silindi" });
+            }
+            catch (Exception ex)
+            {
+                return Problem(
+                    title: "Sunucu hatası",
+                    detail: ex.Message,
+                    statusCode: 500
+                );
             }
         }
     }

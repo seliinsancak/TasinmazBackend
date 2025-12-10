@@ -7,32 +7,49 @@ using TasinmazBackend.Mappings;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// DB Context
-builder.Services.AddDbContext<TasinmazDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Service
+builder.Services.AddDbContext<TasinmazDbContext>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection")
+    ));
+
+
 builder.Services.AddScoped<ITasinmazService, TasinmazService>();
 
-// AutoMapper
+
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
-// Controllers ve Swagger
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngular", policy =>
+    {
+        policy.WithOrigins("https://localhost:4200") 
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Swagger Middleware (her ortamda açýk)
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Tasinmaz API V1");
-    c.RoutePrefix = "swagger"; // https://localhost:7196/swagger çalýþýr
+    c.RoutePrefix = "swagger";  // https://localhost:7196/swagger
 });
 
+
 app.UseHttpsRedirection();
+
+
+app.UseCors("AllowAngular");
+
 app.UseAuthorization();
 
 app.MapControllers();

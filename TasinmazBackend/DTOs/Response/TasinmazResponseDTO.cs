@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using TasinmazBackend.Entities;
+﻿using TasinmazBackend.Entities;
 
 namespace TasinmazBackend.DTO.Response
 {
@@ -10,9 +9,10 @@ namespace TasinmazBackend.DTO.Response
         public string Parsel { get; set; }
         public string Nitelik { get; set; }
         public string Adres { get; set; }
-        public string Mahalle { get; set; }
-        public string Ilce { get; set; }
-        public string Il { get; set; }
 
+        // Mahalle, Ilce, Il DTO türünde olacak
+        public MahalleResponseDTO Mahalle { get; set; }
+        public IlceResponseDTO Ilce { get; set; }
+        public IlResponseDTO Il { get; set; }
     }
 }

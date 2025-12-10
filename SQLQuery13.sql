@@ -1,0 +1,3 @@
+﻿SELECT TABLE_NAME 
+FROM INFORMATION_SCHEMA.TABLES 
+WHERE TABLE_NAME IN ('Iller','Ilceler','Mahalleler','Tasinmazlar');
